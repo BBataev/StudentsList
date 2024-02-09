@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Students List</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+  <script defer src="js/script.js"></script>
+  <script defer src="js/exercise.js"></script>
+</head>
+
+<body class="page">
+  <header class="header">
+    <h1 class="header__title">
+      Students list
+    </h1>
+    <button class="header__btn__addNew active">
+      <p class="header__btn-descr__addNew">
+        Добавить студента
+      </p>
+    </button>
+    <button class="header__btn__filter">
+      <p class="header__btn-descr__filter">
+        Фильтр
+      </p>
+    </button>
+  </header>
+
+  <main class="main">
+    <div class="main-inputPoles">
+      <div class="main-inputPoles-filter inputPoles-active">
+        <h2 class="main-inputPoles-filter__title">
+          Фильтр
+        </h2>
+        <input class="main-inputPoles-filter__input" type="text" placeholder="ФИО">
+        <input class="main-inputPoles-filter__input" type="text" placeholder="Факультет">
+        <div class="main-inputPoles-filter-inputs">
+          <input class="main-inputPoles-filter-inputs__input" type="text" placeholder="Год поступления">
+          <input class="main-inputPoles-filter-inputs__input" type="text" placeholder="Год выпуска">
+        </div>
+      </div>
+
+      <div class="main-inputPoles-addNew">
+        <div class="main-inputPoles-addNew-inputs">
+          <h2 class="main-inputPoles-addNew-inputs__title">
+            Введите информацию о студенте
+          </h2>
+          <div class="main-inputPoles-addNew-inputs-FIO">
+            <input class="main-inputPoles-addNew-inputs-FIO__input" id="input-surname" type="text" placeholder="Фамилия">
+            <input class="main-inputPoles-addNew-inputs-FIO__input" id="input-name" type="text" placeholder="Имя">
+            <input class="main-inputPoles-addNew-inputs-FIO__input" id="input-lastname" type="text" placeholder="Отчество">
+          </div>
+          <div class="main-inputPoles-addNew-inputs-info">
+            <input class="main-inputPoles-addNew-inputs-FIO__input" id="input-by" type="date" placeholder="Пенис">
+            <input class="main-inputPoles-addNew-inputs-FIO__input" id="input-sy" type="number" placeholder="Год поступления">
+            <input class="main-inputPoles-addNew-inputs-FIO__input" id="input-faculty" type="text" placeholder="Факультет">
+          </div>
+        </div>
+        <button class="main-inputPoles-addNew__btn">
+          <p class="main-inputPoles-addNew__btn-descr">
+            Добавить
+          </p>
+        </button>
+      </div>
+    </div>
+    <div class="main-list">
+      <div class="main-list-categories">
+        <p class="main-list-categories__FIO" id="list-FIO">
+          ФИО
+        </p>
+        <p class="main-list-categories__FIO" id="list-faculty">
+          Факультет
+        </p>
+        <p class="main-list-categories__FIO" id="list-age">
+          Возраст
+        </p>
+        <p class="main-list-categories__FIO" id="list-course">
+          Kypc
+        </p>
+      </div>
+      <div class="main-list-students">
+        <!-- Here's all of the students come -->
+        <h1>
+        </h1>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
