@@ -41,7 +41,7 @@
     })
   }
 
-  const outStudents = () =>
+  const outStudents = (students) =>
   {
     const studentsListContainer = document.querySelector('.main-list-students');
 
@@ -263,7 +263,7 @@
 
     validation();
     formatCourse(inputInfo.sYear);
-    outStudents();
+    outStudents(students);
   })
 
 
@@ -274,39 +274,43 @@
   const iYear = document.getElementById("filter-iYear");
   const oYear = document.getElementById("filter-oYear");
 
-  FIO.addEventListener('input', () => TimerBetween(FIOFilter));
-  faculty.addEventListener('input', () => TimerBetween(facultyFilter));
-  iYear.addEventListener('input', () => TimerBetween(iYearFilter));
-  oYear.addEventListener('input', () => TimerBetween(oYearFilter));
+  FIO.addEventListener('input', () => TimerBetween());
+  faculty.addEventListener('input', () => TimerBetween());
+  iYear.addEventListener('input', () => TimerBetween());
+  oYear.addEventListener('input', () => TimerBetween());
 
-  const FIOFilter = () =>
+  const filter = () =>
   {
-    console.log("ФИО");
+    const FIO = document.getElementById("filter-name").value.trim();
+    const facultyElem = document.getElementById("filter-faculty").value.trim();
+    const iYear = parseInt(document.getElementById("filter-iYear").value);
+    const oYear = parseInt(document.getElementById("filter-oYear").value);
+
+    const filteredList = students.filter((student) =>
+    {
+      const nameFilter = new RegExp(FIO, 'i');
+      const facultyFilter = new RegExp(facultyElem, 'i');
+
+      const matchesName = nameFilter.test(student.surname) || nameFilter.test(student.name) || nameFilter.test(student.lastname);
+      const matchesFaculty = facultyFilter.test(student.faculty);
+      const iFiltered = isNaN(iYear) || (iYear === student.sYear);
+      const oFiltered = isNaN(oYear) || (oYear === student.sYear + 4);
+
+      return matchesName && matchesFaculty && iFiltered && oFiltered;
+    })
+
+    outStudents(filteredList);
   }
 
-  const facultyFilter = () =>
-  {
-    console.log("факультет");
-  }
 
-  const iYearFilter = () =>
-  {
-    console.log("поступил");
-  }
-
-  const oYearFilter = () =>
-  {
-    console.log("пошел нахуй даун ебаный");
-  }
-
-  const TimerBetween = (func) =>
+  const TimerBetween = () =>
   {
     clearTimeout(window.inputTimeout);
     window.inputTimeout = setTimeout(function() {
-      func()
+      filter()
     }, 300);
   }
 
-  outStudents();
+  outStudents(students);
 
 })();
