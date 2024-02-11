@@ -4,6 +4,8 @@
   --color-white: #fafafa;
   --color-black: #3f3f3f;
   --color-error: #ff4b4b;
+  --color-errorInput: #fcb1b1;
+  --color-agreed: #b5fdac;
 }
 
 @font-face {
@@ -267,6 +269,7 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
   padding: 26px;
   font-size: 20px;
+  cursor: pointer;
 }
 
 #list-FIO {
@@ -318,9 +321,21 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .main-list-students-student__bYear {
-  width: 210px;
+  width: 215px;
 }
 
 .main-list-students-student__sYear {
   width: 220px;
+}
+
+/* Validation styles */
+
+.error {
+  background-color: var(--color-errorInput);
+  transition: background-color .3s ease-in-out;
+}
+
+.agreed {
+  background-color: var(--color-agreed);
+  transition: background-color .3s ease-in-out;
 }

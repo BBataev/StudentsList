@@ -30,13 +30,12 @@
 
   const addStudent = (surname, name, lastname, bYear, sYear, faculty) =>
   {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
 
     students.push({
       surname,
       name,
       lastname,
-      bYear: new Date(bYear).toLocaleDateString('ru-RU', options),
+      bYear: new Date(bYear),
       sYear: parseInt(sYear),
       faculty
     })
@@ -56,8 +55,8 @@
       <p class="main-list-students-student__index">${index+1}</p>
       <p class="main-list-students-student__name">${student.surname} ${student.name} ${student.lastname}</p>
       <p class="main-list-students-student__faculty">${student.faculty}</p>
-      <p class="main-list-students-student__bYear">${student.bYear}</p>
-      <p class="main-list-students-student__sYear">${student.sYear}</p>
+      <p class="main-list-students-student__bYear">${formatAge(student.bYear)}</p>
+      <p class="main-list-students-student__sYear">${formatCourse(student.sYear)}</p>
       `;
       studentsListContainer.append(studentInfo);
     })
@@ -96,20 +95,165 @@
     };
   }
 
-  // const validation = () =>
-  // {
-  //   const inputSYear = document.getElementById("input-sy").value;
-  //   const inputBYear = document.getElementById("input-by").value;
+  const calculateAge = (date) =>
+  {
+    const nYear = new Date();
+    const bYear = new Date(date);
 
-  //   if (inputSYear < 2000)
-  //   {
-  //     return false;
-  //   }
-  //   else
-  //   {
-  //     return true;
-  //   }
-  // }
+    let age = nYear.getFullYear() - bYear.getFullYear();
+
+    if ( (nYear.getMonth() < bYear.getMonth()) || (nYear.getMonth() === bYear.getMonth() && nYear.getDate() < bYear.getDate()) )
+    {
+      return --age;
+    }
+
+    return age;
+  }
+
+  const formatAge = (date) =>
+  {
+    const age = calculateAge(date);
+
+    const bYear = new Date(date);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+
+
+    if (age % 10 === 1)
+    {
+      return (`${age} год (${bYear.toLocaleDateString('ru-RU', options)})`);
+    }
+    else if ([2, 3, 4].includes(age % 10))
+    {
+      return (`${age} года (${bYear.toLocaleDateString('ru-RU', options)})`);
+    }
+    else
+    {
+      return (`${age} лет (${bYear.toLocaleDateString('ru-RU', options)})`);
+    }
+  }
+
+  const formatCourse = (sYear) =>
+  {
+    let course = new Date().getFullYear() - parseInt(sYear);
+
+    if (new Date().getMonth() >= 8)
+    {
+      course++;
+    }
+    if (course > 4)
+    {
+      return `${sYear} - ${sYear + 4} (окончил)`;
+    }
+    return `${sYear} - ${sYear + 4} (${course} курс)`;
+  }
+
+  const addStyleError = (elem) =>
+  {
+    elem.classList.remove("agreed");
+    elem.classList.add("error");
+  }
+
+  const addStyleAgreed = (elem) =>
+  {
+    elem.classList.remove("error");
+    elem.classList.add("agreed");
+  }
+
+  const validation = () =>
+  {
+    const inputSurname = document.getElementById("input-surname");
+    const inputName = document.getElementById("input-name");
+    const inputLastname = document.getElementById("input-lastname");
+
+    const inputSYear = document.getElementById("input-sy");
+
+    const inputBYear = document.getElementById("input-by");
+    const inputBFullYear = new Date(inputBYear.value);
+
+    const inputFaculty = document.getElementById("input-faculty");
+
+    let checked = true;
+
+    // surname
+    if ((inputSurname.value.trim() === '') || ((inputSurname.value.trim()).length > 15))
+    {
+      addStyleError(inputSurname);
+      checked = false;
+    }
+    else
+    {
+      addStyleAgreed(inputSurname);
+    }
+
+    // name
+    if ((inputName.value.trim() === '') || ((inputName.value.trim()).length > 15))
+    {
+      addStyleError(inputName);
+      checked = false;
+    }
+    else
+    {
+      addStyleAgreed(inputName);
+    }
+
+    // lastname
+    if ((inputLastname.value.trim() === '') || ((inputLastname.value.trim()).length > 15))
+    {
+      addStyleError(inputLastname);
+      checked = false;
+    }
+    else
+    {
+      addStyleAgreed(inputLastname);
+    }
+
+    //sYear
+    if ((inputSYear.value < 2000) || (inputSYear.value >  new Date().getFullYear()))
+    {
+      addStyleError(inputSYear);
+      checked = false;
+    }
+    else
+    {
+      addStyleAgreed(inputSYear);
+    }
+
+    //bYear
+    if ((inputBFullYear.getFullYear() < 1900) || (inputBFullYear > new Date()) || (isNaN(inputBFullYear.getFullYear())))
+    {
+      addStyleError(inputBYear);
+      checked = false;
+    }
+    else
+    {
+      addStyleAgreed(inputBYear);
+    }
+
+    // faculty
+    if ((inputFaculty.value.trim() === '') || ((inputFaculty.value.trim()).length > 15))
+    {
+      addStyleError(inputFaculty);
+      checked = false;
+    }
+    else
+    {
+      addStyleAgreed(inputFaculty);
+    }
+
+    if (checked === true)
+    {
+      const inputInfo = getInput();
+      clearInput();
+      addStudent(inputInfo.surname, inputInfo.name, inputInfo.lastname, inputInfo.bYear, inputInfo.sYear, inputInfo.faculty);
+
+      inputSurname.classList.remove("agreed");
+      inputName.classList.remove("agreed");
+      inputLastname.classList.remove("agreed");
+      inputBYear.classList.remove("agreed");
+      inputSYear.classList.remove("agreed");
+      inputFaculty.classList.remove("agreed");
+    }
+  }
 
   const addBtn = document.querySelector(".main-inputPoles-addNew__btn");
 
@@ -117,10 +261,51 @@
   {
     const inputInfo = getInput();
 
-    addStudent(inputInfo.surname, inputInfo.name, inputInfo.lastname, inputInfo.bYear, inputInfo.sYear, inputInfo.faculty);
-    clearInput();
+    validation();
+    formatCourse(inputInfo.sYear);
     outStudents();
   })
+
+
+  // Filtration
+
+  const FIO = document.getElementById("filter-name");
+  const faculty = document.getElementById("filter-faculty");
+  const iYear = document.getElementById("filter-iYear");
+  const oYear = document.getElementById("filter-oYear");
+
+  FIO.addEventListener('input', () => TimerBetween(FIOFilter));
+  faculty.addEventListener('input', () => TimerBetween(facultyFilter));
+  iYear.addEventListener('input', () => TimerBetween(iYearFilter));
+  oYear.addEventListener('input', () => TimerBetween(oYearFilter));
+
+  const FIOFilter = () =>
+  {
+    console.log("ФИО");
+  }
+
+  const facultyFilter = () =>
+  {
+    console.log("факультет");
+  }
+
+  const iYearFilter = () =>
+  {
+    console.log("поступил");
+  }
+
+  const oYearFilter = () =>
+  {
+    console.log("пошел нахуй даун ебаный");
+  }
+
+  const TimerBetween = (func) =>
+  {
+    clearTimeout(window.inputTimeout);
+    window.inputTimeout = setTimeout(function() {
+      func()
+    }, 300);
+  }
 
   outStudents();
 
