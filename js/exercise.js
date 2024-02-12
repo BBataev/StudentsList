@@ -6,7 +6,7 @@
       surname: 'Канафиев',
       name: 'Илья',
       lastname: 'Ильнурович',
-      bYear: '2004-08-16',
+      bYear: new Date('2004-08-16'),
       sYear: 2022,
       faculty: 'ИВТИ'
     },
@@ -14,7 +14,7 @@
       surname: 'Антонова',
       name: 'Алиса',
       lastname: 'Сергеевна',
-      bYear: '2002-03-06',
+      bYear: new Date('2002-03-06'),
       sYear: 2020,
       faculty: 'ИВТИ'
     },
@@ -22,12 +22,14 @@
       surname: 'Нурланова',
       name: 'Александра',
       lastname: 'Евгеньева',
-      bYear: '2005-03-28',
+      bYear: new Date('2005-03-28'),
       sYear: 2023,
       faculty: 'ГПИ'
     },
   ];
 
+
+  //add student by input
   const addStudent = (surname, name, lastname, bYear, sYear, faculty) =>
   {
 
@@ -81,8 +83,8 @@
     const inputSYear = document.getElementById("input-sy").value;
     const inputFaculty = document.getElementById("input-faculty").value.trim();
 
-    let changedName = inputSurname.charAt(0).toUpperCase() + inputSurname.slice(1).toLowerCase();
-    let changedSurname = inputName.charAt(0).toUpperCase() + inputName.slice(1).toLowerCase();
+    let changedSurname = inputSurname.charAt(0).toUpperCase() + inputSurname.slice(1).toLowerCase();
+    let changedName = inputName.charAt(0).toUpperCase() + inputName.slice(1).toLowerCase();
     let changedLastname = inputLastname.charAt(0).toUpperCase() + inputLastname.slice(1).toLowerCase();
 
     return {
@@ -259,15 +261,11 @@
 
   addBtn.addEventListener('click', () =>
   {
-    const inputInfo = getInput();
-
     validation();
-    formatCourse(inputInfo.sYear);
     outStudents(students);
   })
 
-
-  // Filtration
+  // Filtration by input
 
   const FIO = document.getElementById("filter-name");
   const faculty = document.getElementById("filter-faculty");
@@ -302,7 +300,6 @@
     outStudents(filteredList);
   }
 
-
   const TimerBetween = () =>
   {
     clearTimeout(window.inputTimeout);
@@ -311,6 +308,87 @@
     }, 300);
   }
 
+  // Filtration by click
+
+  const FIOBtn = document.getElementById("list-FIO");
+  const FacultyBtn = document.getElementById("list-faculty");
+  const YearBtn = document.getElementById("list-age");
+  const CourseBtn = document.getElementById("list-course");
+
+  const filterByName = () =>
+  {
+    const filteredList = students.slice().sort((s1, s2) =>
+    {
+      const fullName1 = `${s1.surname} ${s1.name} ${s1.lastname}`;
+      const fullName2 = `${s2.surname} ${s2.name} ${s2.lastname}`;
+
+      if (fullName1 > fullName2) return 1;
+      if (fullName1 < fullName2) return -1;
+      return 0;
+    })
+
+    outStudents(filteredList);
+  }
+
+  const filterByFaculty = () =>
+  {
+    const filteredList = students.slice().sort((s1, s2) =>
+    {
+      if (s1.faculty > s2.faculty) return 1;
+      if (s1.faculty < s2.faculty) return -1;
+      return 0;
+    })
+
+    outStudents(filteredList);
+  }
+
+
+  const filterByYear = () =>
+  {
+    const filteredList = students.slice().sort((s1, s2) =>
+    {
+      if (s1.bYear < s2.bYear) return 1;
+      if (s1.bYear > s2.bYear) return -1;
+      return 0;
+    })
+
+    outStudents(filteredList);
+  }
+
+  const filterByCourse = () =>
+  {
+    const filteredList = students.slice().sort((s1, s2) =>
+    {
+      if (s1.sYear > s2.sYear) return 1;
+      if (s1.sYear < s2.sYear) return -1;
+      return 0;
+    })
+
+    outStudents(filteredList);
+  }
+
+  FIOBtn.addEventListener("click", () =>
+  {
+    filterByName();
+  })
+
+  FacultyBtn.addEventListener("click", () =>
+  {
+    filterByFaculty();
+  })
+
+  YearBtn.addEventListener("click", () =>
+  {
+    filterByYear();
+  })
+
+  CourseBtn.addEventListener("click", () =>
+  {
+    filterByCourse();
+  })
+
+
+  // Print list of students on the site
   outStudents(students);
 
 })();
