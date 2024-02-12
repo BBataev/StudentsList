@@ -1,5 +1,7 @@
 (() => {
 
+  // Students list
+
   const students =
   [
     {
@@ -29,7 +31,8 @@
   ];
 
 
-  //add student by input
+  // Аdd student by input
+
   const addStudent = (surname, name, lastname, bYear, sYear, faculty) =>
   {
 
@@ -122,15 +125,15 @@
 
     if (age % 10 === 1)
     {
-      return (`${age} год (${bYear.toLocaleDateString('ru-RU', options)})`);
+      return (`${bYear.toLocaleDateString('ru-RU', options)} (${age} год)`);
     }
     else if ([2, 3, 4].includes(age % 10))
     {
-      return (`${age} года (${bYear.toLocaleDateString('ru-RU', options)})`);
+      return (`${bYear.toLocaleDateString('ru-RU', options)} (${age} года)`);
     }
     else
     {
-      return (`${age} лет (${bYear.toLocaleDateString('ru-RU', options)})`);
+      return (`${bYear.toLocaleDateString('ru-RU', options)} (${age} лет)`);
     }
   }
 
@@ -254,6 +257,8 @@
       inputBYear.classList.remove("agreed");
       inputSYear.classList.remove("agreed");
       inputFaculty.classList.remove("agreed");
+
+      outStudents(students);
     }
   }
 
@@ -262,7 +267,6 @@
   addBtn.addEventListener('click', () =>
   {
     validation();
-    outStudents(students);
   })
 
   // Filtration by input
@@ -319,8 +323,8 @@
   {
     const filteredList = students.slice().sort((s1, s2) =>
     {
-      const fullName1 = `${s1.surname} ${s1.name} ${s1.lastname}`;
-      const fullName2 = `${s2.surname} ${s2.name} ${s2.lastname}`;
+      const fullName1 = `${s1.surname} ${s1.name} ${s1.lastname}`.toLocaleLowerCase();
+      const fullName2 = `${s2.surname} ${s2.name} ${s2.lastname}`.toLocaleLowerCase();
 
       if (fullName1 > fullName2) return 1;
       if (fullName1 < fullName2) return -1;
@@ -334,8 +338,8 @@
   {
     const filteredList = students.slice().sort((s1, s2) =>
     {
-      if (s1.faculty > s2.faculty) return 1;
-      if (s1.faculty < s2.faculty) return -1;
+      if (s1.faculty.toLocaleLowerCase() > s2.faculty.toLocaleLowerCase()) return 1;
+      if (s1.faculty.toLocaleLowerCase() < s2.faculty.toLocaleLowerCase()) return -1;
       return 0;
     })
 

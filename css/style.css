@@ -65,6 +65,7 @@ input[type="number"]::-webkit-outer-spin-button {
   transform: translateX(1000px);
   background-color: var(--color-black);
   cursor: pointer;
+  pointer-events: none;
   transition: transform .25s ease-in-out;
 }
 
@@ -85,7 +86,8 @@ input[type="number"]::-webkit-outer-spin-button {
   transform: translateX(1000px);
   background-color: var(--color-black);
   cursor: pointer;
-  transition: transform .25s ease-in-out;
+  pointer-events: none;
+  transition: transform .25s ease-in-out, display .25s ease-in;
 }
 
 .header__btn-descr__filter {
@@ -97,6 +99,7 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .active {
+  pointer-events: all;
   transform: translateX(0);
 }
 
@@ -265,11 +268,21 @@ input[type="number"]::-webkit-outer-spin-button {
   color: var(--color-white);
 }
 
-.main-list-categories__FIO {
+.main-list-categories__btn {
+  border: none;
   margin: 0;
   padding: 26px;
+  font-family: 'Inter', sans-serif;
   font-size: 20px;
+  color: var(--color-white);
+  background-color: var(--color-black);
   cursor: pointer;
+  transition: color .25s ease-in-out;
+}
+
+.main-list-categories__btn:focus {
+  outline: none;
+  color: #b5fdac;
 }
 
 #list-FIO {
