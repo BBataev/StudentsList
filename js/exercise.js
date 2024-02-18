@@ -152,16 +152,46 @@
     return `${sYear} - ${sYear + 4} (${course} курс)`;
   }
 
-  const addStyleError = (elem) =>
+  const addStyleError = (elem, error) =>
   {
     elem.classList.remove("agreed");
     elem.classList.add("error");
+
+    setTimeout(() => {
+      error.classList.add("errActive");
+    }, 100);
   }
 
   const addStyleAgreed = (elem) =>
   {
     elem.classList.remove("error");
     elem.classList.add("agreed");
+  }
+
+  const addErrorMessage = (errorMessage, messageContainer, id) =>
+  {
+    const message = document.createElement("p");
+
+    message.classList.add("main-inputPoles-addNew-errorWindow__errorMessage");
+
+    message.id = id;
+
+    message.innerHTML =
+    `
+        ${errorMessage}
+    `;
+
+    messageContainer.appendChild(message);
+  }
+
+  const removeError = (id) =>
+  {
+    if (document.getElementById(id))
+    {
+      const error = document.getElementById(id);
+
+      error.remove()
+    }
   }
 
   const validation = () =>
@@ -177,72 +207,162 @@
 
     const inputFaculty = document.getElementById("input-faculty");
 
+    const errorWindow = document.querySelector(".main-inputPoles-addNew-errorWindow");
+
     let checked = true;
 
+    let errorMessage;
+
     // surname
-    if ((inputSurname.value.trim() === '') || ((inputSurname.value.trim()).length > 15))
+    if ((inputSurname.value.trim() === ''))
     {
-      addStyleError(inputSurname);
+      addStyleError(inputSurname, errorWindow);
       checked = false;
+
+      if (inputSurname.value.trim() === '')
+      {
+        errorMessage = "Введите фамилию студента";
+      }
+
+      removeError("surnameError");
+
+      addErrorMessage(errorMessage, errorWindow, "surnameError");
     }
     else
     {
       addStyleAgreed(inputSurname);
+
+      removeError("surnameError");
     }
 
     // name
-    if ((inputName.value.trim() === '') || ((inputName.value.trim()).length > 15))
+    if ((inputName.value.trim() === ''))
     {
-      addStyleError(inputName);
+      addStyleError(inputName, errorWindow);
       checked = false;
+
+      if (inputName.value.trim() === '')
+      {
+        errorMessage = "Введите имя студента";
+      }
+
+      removeError("nameError");
+      addErrorMessage(errorMessage, errorWindow, "nameError");
     }
     else
     {
       addStyleAgreed(inputName);
+
+      removeError("nameError");
+
     }
 
     // lastname
-    if ((inputLastname.value.trim() === '') || ((inputLastname.value.trim()).length > 15))
+    if ((inputLastname.value.trim() === ''))
     {
-      addStyleError(inputLastname);
+      addStyleError(inputLastname, errorWindow);
       checked = false;
+
+      if (inputLastname.value.trim() === '')
+      {
+        errorMessage = "Введите отчество студента";
+      }
+
+      removeError("lastnameError");
+      addErrorMessage(errorMessage, errorWindow, "lastnameError");
     }
     else
     {
       addStyleAgreed(inputLastname);
+
+      removeError("lastnameError");
     }
 
-    //sYear
-    if ((inputSYear.value < 2000) || (inputSYear.value >  new Date().getFullYear()))
-    {
-      addStyleError(inputSYear);
-      checked = false;
-    }
-    else
-    {
-      addStyleAgreed(inputSYear);
-    }
 
     //bYear
     if ((inputBFullYear.getFullYear() < 1900) || (inputBFullYear > new Date()) || (isNaN(inputBFullYear.getFullYear())))
     {
-      addStyleError(inputBYear);
+      addStyleError(inputBYear, errorWindow);
       checked = false;
+
+
+      if (inputBFullYear.getFullYear() < 1900)
+      {
+        errorMessage = "Дата рождения не может быть меньше 1900 года";
+      }
+      else if (inputBFullYear > new Date())
+      {
+        errorMessage = "Дата рождения не может быть больше текущей";
+      }
+      else if (isNaN(inputBFullYear.getFullYear()))
+      {
+        errorMessage = "Введите дату рождения";
+      }
+
+      removeError("errorShowedYDate");
+      addErrorMessage(errorMessage, errorWindow, "errorShowedYDate");
     }
     else
     {
       addStyleAgreed(inputBYear);
+
+      removeError("errorShowedYDate");
+    }
+
+    //sYear
+    if ((inputSYear.value < 2000) || (inputSYear.value >  new Date().getFullYear()) || (inputSYear.value === ""))
+    {
+      addStyleError(inputSYear, errorWindow);
+      checked = false;
+
+      if (inputSYear.value < 2000)
+      {
+        errorMessage = "Год поступления не может быть меньше 2000 года";
+      }
+      else if (inputSYear.value > new Date().getFullYear())
+      {
+        errorMessage = "Год поступления не может быть меньше текущего года";
+      }
+      if (inputSYear.value === "")
+      {
+        errorMessage = "Введите год поступления";
+      }
+
+      removeError("errorShowedBDate");
+      addErrorMessage(errorMessage, errorWindow, "errorShowedBDate");
+
+    }
+    else
+    {
+      addStyleAgreed(inputSYear);
+
+      removeError("errorShowedBDate");
     }
 
     // faculty
-    if ((inputFaculty.value.trim() === '') || ((inputFaculty.value.trim()).length > 15))
+    if ((inputFaculty.value.trim() === ''))
     {
-      addStyleError(inputFaculty);
+      addStyleError(inputFaculty, errorWindow);
       checked = false;
+
+      if (inputFaculty.value.trim() === '')
+      {
+        errorMessage = "Введите факультет студента";
+      }
+
+      removeError("errorShowedFaculty");
+      addErrorMessage(errorMessage, errorWindow, "errorShowedFaculty");
     }
     else
     {
       addStyleAgreed(inputFaculty);
+
+      removeError("errorShowedFaculty");
+    }
+
+    if (!checked === true)
+    {
+
     }
 
     if (checked === true)
@@ -257,6 +377,8 @@
       inputBYear.classList.remove("agreed");
       inputSYear.classList.remove("agreed");
       inputFaculty.classList.remove("agreed");
+
+      errorWindow.classList.remove("errActive");
 
       outStudents(students);
     }
