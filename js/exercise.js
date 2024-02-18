@@ -321,7 +321,7 @@
       }
       else if (inputSYear.value > new Date().getFullYear())
       {
-        errorMessage = "Год поступления не может быть меньше текущего года";
+        errorMessage = "Год поступления не может быть больше текущего года";
       }
       if (inputSYear.value === "")
       {

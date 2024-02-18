@@ -206,6 +206,7 @@ input[type="number"]::-webkit-outer-spin-button {
   gap: 49px;
 }
 
+
 .main-inputPoles-addNew-inputs-FIO__input:focus {
   outline: none;
 }
@@ -224,6 +225,16 @@ input[type="number"]::-webkit-outer-spin-button {
   display: flex;
   justify-content: center;
   gap: 49px;
+}
+
+.main-inputPoles-addNew-inputs-info__input {
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+  padding: 11px 20px;
+  color: var(--color-black);
 }
 
 #input-by {
@@ -365,7 +376,6 @@ input[type="number"]::-webkit-outer-spin-button {
   background-color: var(--color-error);
   opacity: 0;
   transform: translate(-50%, -50%);
-  transition: opacity .3s ease-in-out;
 }
 
 .main-inputPoles-addNew-errorWindow__message {
@@ -378,6 +388,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .errActive {
   opacity: 1;
+  transition: opacity .3s ease-in-out;
 }
 
 .main-inputPoles-addNew-errorWindow__errorMessage {
