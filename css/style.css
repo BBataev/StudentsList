@@ -221,6 +221,7 @@ input[type="number"]::-webkit-outer-spin-button {
   color: var(--color-black);
 }
 
+
 .main-inputPoles-addNew-inputs-info {
   display: flex;
   justify-content: center;
@@ -235,6 +236,10 @@ input[type="number"]::-webkit-outer-spin-button {
   margin-bottom: 18px;
   padding: 11px 20px;
   color: var(--color-black);
+}
+
+.main-inputPoles-addNew-inputs-info__input:focus {
+  outline: none;
 }
 
 #input-by {
@@ -323,13 +328,26 @@ input[type="number"]::-webkit-outer-spin-button {
   overflow: auto;
 }
 
+.main-list-students__emptyMessage {
+  margin: 0;
+  padding-top: 42px;
+  font-size: 28px;
+  text-align: center;
+}
+
 .main-list-students::-webkit-scrollbar {
   width: 0;
 }
 
 .main-list-students-student {
   display: flex;
+  position: relative;
   justify-content: space-between;
+  transition: background-color .1s ease-in-out;
+}
+
+.main-list-students-student:hover {
+  background-color: #eeeeee;
 }
 
 .main-list-students-student__index {
@@ -345,12 +363,24 @@ input[type="number"]::-webkit-outer-spin-button {
   width: 130px;
 }
 
-.main-list-students-student__bYear {
-  width: 215px;
+.main-list-students-student__birthday {
+  width: 216px;
 }
 
-.main-list-students-student__sYear {
+.main-list-students-student__studyStart {
   width: 220px;
+}
+
+.main-list-students-student__delete {
+  position: absolute;
+  top: 50%;
+  right: 22px;
+  width: 20px;
+  height: 20px;
+  transform: translateY(-50%);
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity .1s ease-in-out;
 }
 
 /* Validation styles */
@@ -365,6 +395,13 @@ input[type="number"]::-webkit-outer-spin-button {
   transition: background-color .3s ease-in-out;
 }
 
+.showed {
+  opacity: 1;
+}
+
+.unshowed {
+  opacity: 0;
+}
 /* Error message styles */
 
 .main-inputPoles-addNew-errorWindow {

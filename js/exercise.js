@@ -1,49 +1,43 @@
-(() => {
+( async () => {
+
+  // Numeric constants
+  const MAXCOURSE = 4
+  const MINBIRTHDAYYEAR = 1900;
+  const MINSTARTYEAR = 2000;
+  const TIMERTIME = 300;
+  const STYLEADDTIMER = 100;
 
   // Students list
 
-  const students =
-  [
-    {
-      surname: 'Канафиев',
-      name: 'Илья',
-      lastname: 'Ильнурович',
-      bYear: new Date('2004-08-16'),
-      sYear: 2022,
-      faculty: 'ИВТИ'
-    },
-    {
-      surname: 'Антонова',
-      name: 'Алиса',
-      lastname: 'Сергеевна',
-      bYear: new Date('2002-03-06'),
-      sYear: 2020,
-      faculty: 'ИВТИ'
-    },
-    {
-      surname: 'Нурланова',
-      name: 'Александра',
-      lastname: 'Евгеньева',
-      bYear: new Date('2005-03-28'),
-      sYear: 2023,
-      faculty: 'ГПИ'
-    },
-  ];
+  const fetchStudents = async () => {
+    const res = await fetch('http://localhost:3000/api/students/');
+    return await res.json();
+  };
 
+  const students = await fetchStudents();
 
   // Аdd student by input
 
-  const addStudent = (surname, name, lastname, bYear, sYear, faculty) =>
+  const addStudent = async (surname, name, lastname, birthday, studyStart, faculty) =>
   {
-
-    students.push({
-      surname,
-      name,
-      lastname,
-      bYear: new Date(bYear),
-      sYear: parseInt(sYear),
-      faculty
+    await fetch('http://localhost:3000/api/students/', {
+      method: 'POST',
+      body: JSON.stringify({
+        surname: surname,
+        name: name,
+        lastname: lastname,
+        birthday: birthday,
+        studyStart: studyStart,
+        faculty: faculty,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      }
     })
+
+    // Immediately out students to avoid an discrepancy with list
+    const students = await fetchStudents();
+    outStudents(students);
   }
 
   const outStudents = (students) =>
@@ -52,19 +46,62 @@
 
     studentsListContainer.textContent = '';
 
-    students.forEach((student, index) => {
-      const studentInfo = document.createElement('div');
-      studentInfo.classList.add('main-list-students-student');
-      studentInfo.innerHTML =
-      `
-      <p class="main-list-students-student__index">${index+1}</p>
-      <p class="main-list-students-student__name">${student.surname} ${student.name} ${student.lastname}</p>
-      <p class="main-list-students-student__faculty">${student.faculty}</p>
-      <p class="main-list-students-student__bYear">${formatAge(student.bYear)}</p>
-      <p class="main-list-students-student__sYear">${formatCourse(student.sYear)}</p>
-      `;
-      studentsListContainer.append(studentInfo);
+    if (students.length === 0)
+    {
+      const emptyListMessage = document.createElement('p');
+
+      emptyListMessage.textContent = 'Список студентов пуст';
+      emptyListMessage.classList.add('main-list-students__emptyMessage');
+
+      studentsListContainer.append(emptyListMessage);
+    }
+    else
+    {
+      students.forEach((student, index) => {
+        const studentInfo = document.createElement('div');
+        studentInfo.classList.add('main-list-students-student');
+        studentInfo.id = 'student_' + index;
+        studentInfo.innerHTML =
+        `
+        <p class="main-list-students-student__index">${index+1}</p>
+        <p class="main-list-students-student__name">${student.surname} ${student.name} ${student.lastname}</p>
+        <p class="main-list-students-student__faculty">${student.faculty}</p>
+        <p class="main-list-students-student__birthday">${formatAge(student.birthday)}</p>
+        <p class="main-list-students-student__studyStart">${formatCourse(student.studyStart)}</p>
+        <img class="main-list-students-student__delete" alt="delete button" src="img/deleteBtn.svg" id="deleteBtn_${index}"></img>
+        `;
+
+        studentsListContainer.append(studentInfo);
+
+        const deleteBtn = document.getElementById('deleteBtn_' + index);
+
+        studentInfo.addEventListener('mouseenter', () => {
+          deleteBtn.classList.remove("unshowed");
+          deleteBtn.classList.add("showed");
+        })
+
+        studentInfo.addEventListener('mouseleave', () => {
+          deleteBtn.classList.remove("showed");
+          deleteBtn.classList.add("unshowed");
+        })
+
+        deleteBtn.addEventListener('click', () => {
+          deleteStudent(student.id);
+        })
+      })
+    }
+  }
+
+  const deleteStudent = async (id) =>
+  {
+    await fetch('http://localhost:3000/api/students/' + id, {
+      method: 'DELETE',
     })
+
+    const students = await fetchStudents();
+
+    // Обновляем отображение списка студентов
+    outStudents(students);
   }
 
   const clearInput = () =>
@@ -82,8 +119,8 @@
     const inputSurname = document.getElementById("input-surname").value.trim();
     const inputName = document.getElementById("input-name").value.trim();
     const inputLastname = document.getElementById("input-lastname").value.trim();
-    const inputBYear = document.getElementById("input-by").value;
-    const inputSYear = document.getElementById("input-sy").value;
+    const inputbirthday = document.getElementById("input-by").value;
+    const inputstudyStart = document.getElementById("input-sy").value;
     const inputFaculty = document.getElementById("input-faculty").value.trim();
 
     let changedSurname = inputSurname.charAt(0).toUpperCase() + inputSurname.slice(1).toLowerCase();
@@ -94,8 +131,8 @@
       surname: changedSurname,
       name: changedName,
       lastname: changedLastname,
-      bYear: inputBYear,
-      sYear: inputSYear,
+      birthday: inputbirthday,
+      studyStart: inputstudyStart,
       faculty: inputFaculty
     };
   }
@@ -103,11 +140,11 @@
   const calculateAge = (date) =>
   {
     const nYear = new Date();
-    const bYear = new Date(date);
+    const birthday = new Date(date);
 
-    let age = nYear.getFullYear() - bYear.getFullYear();
+    let age = nYear.getFullYear() - birthday.getFullYear();
 
-    if ( (nYear.getMonth() < bYear.getMonth()) || (nYear.getMonth() === bYear.getMonth() && nYear.getDate() < bYear.getDate()) )
+    if ( (nYear.getMonth() < birthday.getMonth()) || (nYear.getMonth() === birthday.getMonth() && nYear.getDate() < birthday.getDate()) )
     {
       return --age;
     }
@@ -115,41 +152,45 @@
     return age;
   }
 
+  // Formating Age
   const formatAge = (date) =>
   {
     const age = calculateAge(date);
 
-    const bYear = new Date(date);
+    const birthday = new Date(date);
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
 
 
     if (age % 10 === 1)
     {
-      return (`${bYear.toLocaleDateString('ru-RU', options)} (${age} год)`);
+      return (`${birthday.toLocaleDateString('ru-RU', options)} (${age} год)`);
     }
     else if ([2, 3, 4].includes(age % 10))
     {
-      return (`${bYear.toLocaleDateString('ru-RU', options)} (${age} года)`);
+      return (`${birthday.toLocaleDateString('ru-RU', options)} (${age} года)`);
     }
     else
     {
-      return (`${bYear.toLocaleDateString('ru-RU', options)} (${age} лет)`);
+      return (`${birthday.toLocaleDateString('ru-RU', options)} (${age} лет)`);
     }
   }
 
-  const formatCourse = (sYear) =>
+  // Formating Course
+  const formatCourse = (studyStart) =>
   {
-    let course = new Date().getFullYear() - parseInt(sYear);
+    studyStart = parseInt(studyStart);
+
+    let course = new Date().getFullYear() - studyStart;
 
     if (new Date().getMonth() >= 8)
     {
       course++;
     }
-    if (course > 4)
+    if (course > MAXCOURSE)
     {
-      return `${sYear} - ${sYear + 4} (окончил)`;
+      return `${studyStart} - ${studyStart + MAXCOURSE} (окончил)`;
     }
-    return `${sYear} - ${sYear + 4} (${course} курс)`;
+    return `${studyStart} - ${studyStart + MAXCOURSE} (${course} курс)`;
   }
 
   const addStyleError = (elem, error) =>
@@ -159,7 +200,7 @@
 
     setTimeout(() => {
       error.classList.add("errActive");
-    }, 100);
+    }, STYLEADDTIMER);
   }
 
   const addStyleAgreed = (elem) =>
@@ -194,16 +235,16 @@
     }
   }
 
-  const validation = () =>
+  const validation = async () =>
   {
     const inputSurname = document.getElementById("input-surname");
     const inputName = document.getElementById("input-name");
     const inputLastname = document.getElementById("input-lastname");
 
-    const inputSYear = document.getElementById("input-sy");
+    const inputstudyStart = document.getElementById("input-sy");
 
-    const inputBYear = document.getElementById("input-by");
-    const inputBFullYear = new Date(inputBYear.value);
+    const inputbirthday = document.getElementById("input-by");
+    const inputBFullYear = new Date(inputbirthday.value);
 
     const inputFaculty = document.getElementById("input-faculty");
 
@@ -213,8 +254,12 @@
 
     let errorMessage;
 
+    const regex = /^[a-zA-Zа-яА-Яё\s-]+$/;
+
+    const regexFaculty = /^[a-zA-Zа-яА-Яё\s]+$/;
+
     // surname
-    if ((inputSurname.value.trim() === ''))
+    if ((inputSurname.value.trim() === '') || (!regex.test(inputSurname.value.trim())))
     {
       addStyleError(inputSurname, errorWindow);
       checked = false;
@@ -223,7 +268,10 @@
       {
         errorMessage = "Введите фамилию студента";
       }
-
+      else if (!regex.test(inputSurname.value.trim()))
+      {
+        errorMessage = "Недопустимые символы в фамилии";
+      }
       removeError("surnameError");
 
       addErrorMessage(errorMessage, errorWindow, "surnameError");
@@ -236,14 +284,19 @@
     }
 
     // name
-    if ((inputName.value.trim() === ''))
+    if ((inputName.value.trim() === '') || (!regex.test(inputName.value.trim())))
     {
       addStyleError(inputName, errorWindow);
       checked = false;
 
-      if (inputName.value.trim() === '')
+
+      if ((inputName.value.trim() === ''))
       {
         errorMessage = "Введите имя студента";
+      }
+      else if (!regex.test(inputName.value.trim()))
+      {
+        errorMessage = "Недопустимые символы в имени";
       }
 
       removeError("nameError");
@@ -254,11 +307,10 @@
       addStyleAgreed(inputName);
 
       removeError("nameError");
-
     }
 
     // lastname
-    if ((inputLastname.value.trim() === ''))
+    if ((inputLastname.value.trim() === '') || (!regex.test(inputLastname.value.trim())))
     {
       addStyleError(inputLastname, errorWindow);
       checked = false;
@@ -266,6 +318,10 @@
       if (inputLastname.value.trim() === '')
       {
         errorMessage = "Введите отчество студента";
+      }
+      else if (!regex.test(inputLastname.value.trim()))
+      {
+        errorMessage = "Недопустимые символы в отчестве";
       }
 
       removeError("lastnameError");
@@ -278,15 +334,14 @@
       removeError("lastnameError");
     }
 
-
-    //bYear
-    if ((inputBFullYear.getFullYear() < 1900) || (inputBFullYear > new Date()) || (isNaN(inputBFullYear.getFullYear())))
+    //birthday
+    if ((inputBFullYear.getFullYear() < MINBIRTHDAYYEAR) || (inputBFullYear > new Date()) || (isNaN(inputBFullYear.getFullYear())))
     {
-      addStyleError(inputBYear, errorWindow);
+      addStyleError(inputbirthday, errorWindow);
       checked = false;
 
 
-      if (inputBFullYear.getFullYear() < 1900)
+      if (inputBFullYear.getFullYear() < MINBIRTHDAYYEAR)
       {
         errorMessage = "Дата рождения не может быть меньше 1900 года";
       }
@@ -304,52 +359,55 @@
     }
     else
     {
-      addStyleAgreed(inputBYear);
+      addStyleAgreed(inputbirthday);
 
       removeError("errorShowedYDate");
     }
 
-    //sYear
-    if ((inputSYear.value < 2000) || (inputSYear.value >  new Date().getFullYear()) || (inputSYear.value === ""))
+    //studyStart
+    if ((inputstudyStart.value < MINSTARTYEAR) || (inputstudyStart.value >  new Date().getFullYear()) || (inputstudyStart.value === ""))
     {
-      addStyleError(inputSYear, errorWindow);
+      addStyleError(inputstudyStart, errorWindow);
       checked = false;
 
-      if (inputSYear.value < 2000)
+      if (inputstudyStart.value < MINSTARTYEAR)
       {
         errorMessage = "Год поступления не может быть меньше 2000 года";
       }
-      else if (inputSYear.value > new Date().getFullYear())
+      else if (inputstudyStart.value > new Date().getFullYear())
       {
         errorMessage = "Год поступления не может быть больше текущего года";
       }
-      if (inputSYear.value === "")
+      if (inputstudyStart.value === "")
       {
         errorMessage = "Введите год поступления";
       }
 
       removeError("errorShowedBDate");
       addErrorMessage(errorMessage, errorWindow, "errorShowedBDate");
-
     }
     else
     {
-      addStyleAgreed(inputSYear);
+      addStyleAgreed(inputstudyStart);
 
       removeError("errorShowedBDate");
     }
 
     // faculty
-    if ((inputFaculty.value.trim() === ''))
+    if ((inputFaculty.value.trim() === '') || (!regexFaculty.test(inputFaculty.value.trim())))
     {
       addStyleError(inputFaculty, errorWindow);
       checked = false;
+
 
       if (inputFaculty.value.trim() === '')
       {
         errorMessage = "Введите факультет студента";
       }
-
+      else if (!regexFaculty.test(inputFaculty.value.trim()))
+      {
+        errorMessage = "Недопустимые символы в факультете";
+      }
       removeError("errorShowedFaculty");
       addErrorMessage(errorMessage, errorWindow, "errorShowedFaculty");
     }
@@ -360,33 +418,28 @@
       removeError("errorShowedFaculty");
     }
 
-    if (!checked === true)
-    {
-
-    }
-
     if (checked === true)
     {
       const inputInfo = getInput();
+
+      await addStudent(inputInfo.surname, inputInfo.name, inputInfo.lastname, inputInfo.birthday, inputInfo.studyStart, inputInfo.faculty);
+
       clearInput();
-      addStudent(inputInfo.surname, inputInfo.name, inputInfo.lastname, inputInfo.bYear, inputInfo.sYear, inputInfo.faculty);
 
       inputSurname.classList.remove("agreed");
       inputName.classList.remove("agreed");
       inputLastname.classList.remove("agreed");
-      inputBYear.classList.remove("agreed");
-      inputSYear.classList.remove("agreed");
+      inputbirthday.classList.remove("agreed");
+      inputstudyStart.classList.remove("agreed");
       inputFaculty.classList.remove("agreed");
 
       errorWindow.classList.remove("errActive");
-
-      outStudents(students);
     }
   }
 
   const addBtn = document.querySelector(".main-inputPoles-addNew__btn");
 
-  addBtn.addEventListener('click', () =>
+  addBtn.addEventListener('click', async () =>
   {
     validation();
   })
@@ -403,7 +456,7 @@
   iYear.addEventListener('input', () => TimerBetween());
   oYear.addEventListener('input', () => TimerBetween());
 
-  const filter = () =>
+  const filter = (students) =>
   {
     const FIO = document.getElementById("filter-name").value.trim();
     const facultyElem = document.getElementById("filter-faculty").value.trim();
@@ -417,8 +470,8 @@
 
       const matchesName = nameFilter.test(student.surname) || nameFilter.test(student.name) || nameFilter.test(student.lastname);
       const matchesFaculty = facultyFilter.test(student.faculty);
-      const iFiltered = isNaN(iYear) || (iYear === student.sYear);
-      const oFiltered = isNaN(oYear) || (oYear === student.sYear + 4);
+      const iFiltered = isNaN(iYear) || (iYear === parseInt(student.studyStart));
+      const oFiltered = isNaN(oYear) || (oYear === parseInt(student.studyStart) + 4);
 
       return matchesName && matchesFaculty && iFiltered && oFiltered;
     })
@@ -429,9 +482,11 @@
   const TimerBetween = () =>
   {
     clearTimeout(window.inputTimeout);
-    window.inputTimeout = setTimeout(function() {
-      filter()
-    }, 300);
+    window.inputTimeout = setTimeout(async () => {
+      const students = await fetchStudents();
+
+      filter(students)
+    }, TIMERTIME);
   }
 
   // Filtration by click
@@ -441,7 +496,7 @@
   const YearBtn = document.getElementById("list-age");
   const CourseBtn = document.getElementById("list-course");
 
-  const filterByName = () =>
+  const filterByName = (students) =>
   {
     const filteredList = students.slice().sort((s1, s2) =>
     {
@@ -456,7 +511,7 @@
     outStudents(filteredList);
   }
 
-  const filterByFaculty = () =>
+  const filterByFaculty = (students) =>
   {
     const filteredList = students.slice().sort((s1, s2) =>
     {
@@ -469,50 +524,57 @@
   }
 
 
-  const filterByYear = () =>
+  const filterByYear = (students) =>
   {
     const filteredList = students.slice().sort((s1, s2) =>
     {
-      if (s1.bYear < s2.bYear) return 1;
-      if (s1.bYear > s2.bYear) return -1;
+      if (s1.birthday < s2.birthday) return 1;
+      if (s1.birthday > s2.birthday) return -1;
       return 0;
     })
 
     outStudents(filteredList);
   }
 
-  const filterByCourse = () =>
+  const filterByCourse = (students) =>
   {
     const filteredList = students.slice().sort((s1, s2) =>
     {
-      if (s1.sYear > s2.sYear) return 1;
-      if (s1.sYear < s2.sYear) return -1;
+      if (s1.studyStart > s2.studyStart) return 1;
+      if (s1.studyStart < s2.studyStart) return -1;
       return 0;
     })
 
     outStudents(filteredList);
   }
 
-  FIOBtn.addEventListener("click", () =>
+  FIOBtn.addEventListener("click", async () =>
   {
-    filterByName();
+    const students = await fetchStudents();
+
+    filterByName(students);
   })
 
-  FacultyBtn.addEventListener("click", () =>
+  FacultyBtn.addEventListener("click", async () =>
   {
-    filterByFaculty();
+    const students = await fetchStudents();
+
+    filterByFaculty(students);
   })
 
-  YearBtn.addEventListener("click", () =>
+  YearBtn.addEventListener("click", async () =>
   {
-    filterByYear();
+    const students = await fetchStudents();
+
+    filterByYear(students);
   })
 
-  CourseBtn.addEventListener("click", () =>
+  CourseBtn.addEventListener("click", async () =>
   {
-    filterByCourse();
-  })
+    const students = await fetchStudents();
 
+    filterByCourse(students);
+  })
 
   // Print list of students on the site
   outStudents(students);
